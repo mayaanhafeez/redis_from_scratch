@@ -1,0 +1,6 @@
+*.o
+/build/
+/redis-server-*
+*.aof
+*.rdb
+.DS_Store
