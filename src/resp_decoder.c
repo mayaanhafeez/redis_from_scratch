@@ -17,7 +17,7 @@ struct Command {
     size_t size;
 };
 
-static char** command_list;
+static struct Command* command_list;
 
 //take in 1 input command and its length, change the global command_list, return 0 on success and -1 on failure
 int parse_input(const char* input, size_t len) {
@@ -26,20 +26,26 @@ int parse_input(const char* input, size_t len) {
     if (input[0]!='*') return -1;
     i++;
     while (input[i]!='\r') {
+        if (input[i] > '9' || input[i] < '0') return -1;
         command_count = (command_count*10) + (input[i] - '0');
         i++;
     }
-    i++;
+    printf("%d", command_count);
+    command_list = malloc(sizeof(struct Command));
 
+    i++;
     if (input[i]!='\n') return -1;
     i++;
-    // while (input[i]!='\r') {
-    //     i++;
-    //     printf("%c\n",input[i]);
-    //     if (input[i]!='*') return -1;
-    //     command_count = (command_count*10) + (input[i] - '0');
-    // }
-    printf("%d", command_count);
+    while (i<len) {
+        if (input[i]!='$') return -1;
+        unsigned int str_len = 0;
+        while (input[i]!='\r') {
+            if (input[i] > '9' || input[i] < '0') return -1;
+            str_len = (str_len*10) + (input[i] - '0');
+            i++;
+        }
+        char command; //continue
+    }
 
 
     return 0;
