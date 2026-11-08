@@ -21,29 +21,26 @@ static char** command_list;
 
 //take in 1 input command and its length, change the global command_list, return 0 on success and -1 on failure
 int parse_input(const char* input, size_t len) {
-    unsigned int command_count;
+    unsigned int command_count = 0;
     unsigned int i=0;
     if (input[0]!='*') return -1;
+    i++;
     while (input[i]!='\r') {
+        command_count = (command_count*10) + (input[i] - '0');
         i++;
     }
+    i++;
 
-    char command_count_s[i];
-    strncpy(command_count_s, input + 1, i-1);
-    command_count_s[i]='\0';
+    if (input[i]!='\n') return -1;
+    i++;
+    // while (input[i]!='\r') {
+    //     i++;
+    //     printf("%c\n",input[i]);
+    //     if (input[i]!='*') return -1;
+    //     command_count = (command_count*10) + (input[i] - '0');
+    // }
+    printf("%d", command_count);
 
-    if (strcmp(command_count_s, "0")!=0) {
-        command_count = 0;
-    } else {
-        command_count = atoi(command_count_s);
-    }
-
-    if (input[i+1]!='\n') return -1;
-    command_list = malloc(command_count*sizeof(char*));
-    if (command_list == NULL) {
-        perror("malloc fail");
-        exit(1);
-    }
 
     return 0;
 }
