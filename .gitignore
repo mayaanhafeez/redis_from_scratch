@@ -5,3 +5,5 @@
 *.rdb
 .DS_Store
 /reference
+*.out
+/PLAN.md
