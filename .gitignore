@@ -4,3 +4,4 @@
 *.aof
 *.rdb
 .DS_Store
+/reference
