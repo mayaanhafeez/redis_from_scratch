@@ -7,3 +7,5 @@
 /reference
 *.out
 /PLAN.md
+/redis
+*.dSYM/

@@ -1,8 +1,7 @@
+#include <stddef.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-// example input: *2\r\n$4\r\nECHO\r\n$5\r\nhello\r\n
-// example output: ECHO hello
 
 enum resp_data_type {
     string,
@@ -12,15 +11,26 @@ enum resp_data_type {
     array,
 };
 
-struct Command {
-    char* com;
+struct Arg {
+    char* command;
     size_t size;
 };
 
-static struct Command* command_list;
+struct Command {
+    struct Arg *args;
+    size_t argc;
+};
+
+void free_command_list(struct Arg* command_list, size_t size) {
+    for (size_t i=0; i< size; i++) {
+        free(command_list[i].command);
+    }
+    free(command_list);
+}
 
 //take in 1 input command and its length, change the global command_list, return 0 on success and -1 on failure
-int parse_input(const char* input, size_t len) {
+int parse_input(struct Command *command, const char* input, size_t len) {
+    struct Arg* command_list;
     unsigned int command_count = 0;
     unsigned int i=0;
     if (input[0]!='*') return -1;
@@ -30,12 +40,17 @@ int parse_input(const char* input, size_t len) {
         command_count = (command_count*10) + (input[i] - '0');
         i++;
     }
-    command_list = malloc(sizeof(struct Command));
+    unsigned int command_index = 0;
+    command_list = malloc(command_count*sizeof(struct Arg));
+
 
     if (command_list == NULL) {
         perror("malloc fail");
         exit(1);
     }
+
+    command->args = command_list;
+    command->argc = (size_t)command_count;
 
     i++;
     if (input[i]!='\n') return -1;
@@ -58,21 +73,30 @@ int parse_input(const char* input, size_t len) {
         printf("current char: %c\n", input[i]);
         if (input[i] != '\n') return -1;
         i++;
-        char* command = malloc(str_len*sizeof(char));
-        memcpy(command, input + i, str_len); //continue
+        char* command = malloc((str_len+1)*sizeof(char));
+        if (command == NULL) {
+            perror("malloc fail");
+            exit(1);
+        }
+        memcpy(command, input + i, str_len);
         command[str_len] = '\0';
         i = i + str_len + 2;
         printf("current char: %c, i= %d\n", input[i], i);
+
+        command_list[command_index].command = command;
+        command_list[command_index].size = str_len + 1;
+        command_index++;
         printf("command: %s\n", command);
-
     }
-
     return 0;
 }
 
 int main() {
     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
+    struct Command command;
 
-    parse_input(dummy, strlen(dummy));
+    int value = parse_input(&command, dummy, strlen(dummy));
+    printf("return value:%d\n",value);
+    free_command_list(command.args, command.argc);
     return 0;
 }
