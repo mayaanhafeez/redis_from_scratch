@@ -30,29 +30,48 @@ int parse_input(const char* input, size_t len) {
         command_count = (command_count*10) + (input[i] - '0');
         i++;
     }
-    printf("%d", command_count);
     command_list = malloc(sizeof(struct Command));
+
+    if (command_list == NULL) {
+        perror("malloc fail");
+        exit(1);
+    }
 
     i++;
     if (input[i]!='\n') return -1;
     i++;
+
     while (i<len) {
+        printf("current char: %c\n", input[i]);
         if (input[i]!='$') return -1;
         unsigned int str_len = 0;
+        i++;
         while (input[i]!='\r') {
+            printf("current char: %c\n", input[i]);
             if (input[i] > '9' || input[i] < '0') return -1;
             str_len = (str_len*10) + (input[i] - '0');
+            printf("%d\n", str_len);
             i++;
         }
-        char command; //continue
-    }
 
+        i++;
+        printf("current char: %c\n", input[i]);
+        if (input[i] != '\n') return -1;
+        i++;
+        char* command = malloc(str_len*sizeof(char));
+        memcpy(command, input + i, str_len); //continue
+        command[str_len] = '\0';
+        i = i + str_len + 2;
+        printf("current char: %c, i= %d\n", input[i], i);
+        printf("command: %s\n", command);
+
+    }
 
     return 0;
 }
 
 int main() {
-    const char* dummy = "*2\r\n$4\r\nECHO\r\n$5\r\nhello\r\n";
+    const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
 
     parse_input(dummy, strlen(dummy));
     return 0;
