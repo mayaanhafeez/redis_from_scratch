@@ -11,6 +11,11 @@ enum resp_data_type {
     array,
 };
 
+struct SimpleString {
+    char* string;
+    size_t size;
+};
+
 struct Arg {
     char* command;
     size_t size;
@@ -91,6 +96,19 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     return 0;
 }
 
+char* simple_string_encoder(struct SimpleString input_string) {
+    char* output = malloc((input_string.size+3)*sizeof(char));
+    if (output == NULL) {
+        perror("malloc fail");
+        exit(1);
+    }
+    output[0] = '+';
+    memcpy(output + 1, input_string.string, input_string.size);
+    output[input_string.size+1] = '\r';
+    output[input_string.size+2] = '\n';
+    return output;
+}
+
 int main() {
     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
     struct Command command;
@@ -98,5 +116,12 @@ int main() {
     int value = parse_input(&command, dummy, strlen(dummy));
     printf("return value:%d\n",value);
     free_command_list(command.args, command.argc);
+    struct SimpleString input_string;
+    input_string.string = "hawk";
+    input_string.size = 4;
+
+    char * stored_string = simple_string_encoder(input_string);
+    printf("%s", stored_string);
+    printf("hello");
     return 0;
 }
