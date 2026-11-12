@@ -119,20 +119,23 @@ int simple_string_encoder(char* input_string, struct SimpleString *output) {
     return 0;
 }
 
-int integer_encoder(long long input_int, struct Integer output) {
+int integer_encoder(long long input_int, struct Integer *output) {
     char buf[32];
 
     buf[0] = ':';
     int len = snprintf(buf + 1, sizeof(buf) -1, "%lld", input_int);
     char* int_s = malloc((len+3)*sizeof(char));
+    buf[len+1] = '\r';
+    buf[len+2] = '\n';
+    memcpy(int_s, buf, len+3);
 
     if (int_s == NULL) {
         perror("malloc fail");
         exit(1);
     }
 
-    output.value = int_s;
-    output.size = len + 3;
+    output->value = int_s;
+    output->size = len + 3;
 
     return 0;
 }
@@ -151,5 +154,12 @@ int main() {
 
     printf("%s", simple_string.string);
     printf("%zu\n", simple_string.size);
+    free(simple_string.string);
+
+    struct Integer integer;
+    integer_encoder(742389429, &integer);
+    printf("integer value: %s", integer.value);
+    printf("integer size: %zu\n", integer.size);
+
     return 0;
 }
