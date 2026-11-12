@@ -101,19 +101,20 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     return 0;
 }
 
-int simple_string_encoder(char* input_string, struct SimpleString output) {
+int simple_string_encoder(char* input_string, struct SimpleString *output) {
     size_t size = strlen(input_string);
-    output.string = malloc((size+3)*sizeof(char));
+    output->string = malloc((size+3)*sizeof(char));
+    output->size = size;
 
-    if (output.string == NULL) {
+    if (output->string == NULL) {
         perror("malloc fail");
         exit(1);
     }
 
-    output.string[0] = '+';
-    memcpy(output.string + 1, input_string, size);
-    output.string[size+1] = '\r';
-    output.string[2] = '\n';
+    output->string[0] = '+';
+    memcpy(output->string + 1, input_string, size);
+    output->string[size+1] = '\r';
+    output->string[size+2] = '\n';
 
     return 0;
 }
@@ -143,12 +144,12 @@ int main() {
     int value = parse_input(&command, dummy, strlen(dummy));
     printf("return value:%d\n",value);
     free_command_list(command.args, command.argc);
-    struct SimpleString input_string;
-    input_string.string = "hawk";
-    input_string.size = 4;
+    struct SimpleString simple_string;
+    char* string = "hawk";
 
-    char * stored_string = simple_string_encoder(input_string);
-    printf("%s", stored_string);
-    printf("hello");
+    simple_string_encoder(string, &simple_string);
+
+    printf("%s", simple_string.string);
+    printf("%zu\n", simple_string.size);
     return 0;
 }
