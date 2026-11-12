@@ -26,6 +26,11 @@ struct Command {
     size_t argc;
 };
 
+struct Integer {
+    char* value;
+    size_t size;
+};
+
 void free_command_list(struct Arg* command_list, size_t size) {
     for (size_t i=0; i< size; i++) {
         free(command_list[i].command);
@@ -96,17 +101,39 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     return 0;
 }
 
-char* simple_string_encoder(struct SimpleString input_string) {
-    char* output = malloc((input_string.size+3)*sizeof(char));
-    if (output == NULL) {
+int simple_string_encoder(char* input_string, struct SimpleString output) {
+    size_t size = strlen(input_string);
+    output.string = malloc((size+3)*sizeof(char));
+
+    if (output.string == NULL) {
         perror("malloc fail");
         exit(1);
     }
-    output[0] = '+';
-    memcpy(output + 1, input_string.string, input_string.size);
-    output[input_string.size+1] = '\r';
-    output[input_string.size+2] = '\n';
-    return output;
+
+    output.string[0] = '+';
+    memcpy(output.string + 1, input_string, size);
+    output.string[size+1] = '\r';
+    output.string[2] = '\n';
+
+    return 0;
+}
+
+int integer_encoder(long long input_int, struct Integer output) {
+    char buf[32];
+
+    buf[0] = ':';
+    int len = snprintf(buf + 1, sizeof(buf) -1, "%lld", input_int);
+    char* int_s = malloc((len+3)*sizeof(char));
+
+    if (int_s == NULL) {
+        perror("malloc fail");
+        exit(1);
+    }
+
+    output.value = int_s;
+    output.size = len + 3;
+
+    return 0;
 }
 
 int main() {
