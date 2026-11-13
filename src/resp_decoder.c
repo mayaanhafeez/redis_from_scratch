@@ -150,8 +150,6 @@ int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
         p *= 10;
         x++;
         num = num/p;
-        printf("num is %zu\n", num);
-        printf("x is %zu\n", x);
     }
 
     char* encoded_string = malloc((len+x+5)*sizeof(char));
@@ -159,22 +157,17 @@ int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
 
     char len_string[x];
     snprintf(len_string, x+1, "%zu", len);
-    printf("len_string: %s\n", len_string);
     memcpy(encoded_string + 1, len_string, x);
-    printf("encoded_string: %s\n", encoded_string);
 
     encoded_string[x+1] = '\r';
     encoded_string[x+2] = '\n';
 
-    printf("encoded_string: %s\n", encoded_string);
     memcpy(encoded_string + x + 3, input_string, len);
 
 
-    printf("encoded_string: %s\n", encoded_string);
     encoded_string[len + x + 3] = '\r';
     encoded_string[len + x + 4] = '\n';
 
-    printf("encoded_string: %s\n", encoded_string);
     output->string = malloc((len+x+5)*sizeof(char));
 
     memcpy(output->string, encoded_string, len+x+5);
