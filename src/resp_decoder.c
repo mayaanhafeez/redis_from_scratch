@@ -11,10 +11,6 @@ enum resp_data_type {
     array,
 };
 
-struct SimpleString {
-    char* string;
-    size_t size;
-};
 
 struct Arg {
     char* command;
@@ -24,6 +20,11 @@ struct Arg {
 struct Command {
     struct Arg *args;
     size_t argc;
+};
+
+struct String {
+    char* string;
+    size_t size;
 };
 
 struct Integer {
@@ -101,7 +102,7 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     return 0;
 }
 
-int simple_string_encoder(char* input_string, struct SimpleString *output) {
+int simple_string_encoder(char* input_string, struct String *output) {
     size_t size = strlen(input_string);
     output->string = malloc((size+3)*sizeof(char));
     output->size = size;
@@ -140,6 +141,48 @@ int integer_encoder(long long input_int, struct Integer *output) {
     return 0;
 }
 
+int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
+    size_t x = 1;
+    int p = 1;
+    size_t num = len;
+
+    while (num/p != 0) {
+        p *= 10;
+        x++;
+        num = num/p;
+        printf("num is %zu\n", num);
+        printf("x is %zu\n", x);
+    }
+
+    char* encoded_string = malloc((len+x+5)*sizeof(char));
+    encoded_string[0] = '$';
+
+    char len_string[x];
+    snprintf(len_string, x+1, "%zu", len);
+    printf("len_string: %s\n", len_string);
+    memcpy(encoded_string + 1, len_string, x);
+    printf("encoded_string: %s\n", encoded_string);
+
+    encoded_string[x+1] = '\r';
+    encoded_string[x+2] = '\n';
+
+    printf("encoded_string: %s\n", encoded_string);
+    memcpy(encoded_string + x + 3, input_string, len);
+
+
+    printf("encoded_string: %s\n", encoded_string);
+    encoded_string[len + x + 3] = '\r';
+    encoded_string[len + x + 4] = '\n';
+
+    printf("encoded_string: %s\n", encoded_string);
+    output->string = malloc((len+x+5)*sizeof(char));
+
+    memcpy(output->string, encoded_string, len+x+5);
+    output->size = len;
+
+    return 0;
+}
+
 int main() {
     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
     struct Command command;
@@ -147,7 +190,7 @@ int main() {
     int value = parse_input(&command, dummy, strlen(dummy));
     printf("return value:%d\n",value);
     free_command_list(command.args, command.argc);
-    struct SimpleString simple_string;
+    struct String simple_string;
     char* string = "hawk";
 
     simple_string_encoder(string, &simple_string);
@@ -160,6 +203,11 @@ int main() {
     integer_encoder(742389429, &integer);
     printf("integer value: %s", integer.value);
     printf("integer size: %zu\n", integer.size);
+
+    struct String bulk_string;
+    bulk_string_encoder("good morning sir how are you", 28, &bulk_string);
+    printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
+    free(bulk_string.string);
 
     return 0;
 }
