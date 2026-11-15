@@ -27,6 +27,11 @@ struct String {
     size_t size;
 };
 
+struct Error {
+    char* string;
+    size_t size;
+};
+
 struct Integer {
     char* value;
     size_t size;
@@ -120,6 +125,54 @@ int simple_string_encoder(char* input_string, struct String *output) {
     return 0;
 }
 
+int error_encoder(char* input_error, struct Error *output) {
+    size_t size = strlen(input_error);
+    output->string = malloc((size+3)*sizeof(char));
+    output->size = size;
+
+    if (output->string == NULL) {
+        perror("malloc fail");
+        exit(1);
+    }
+
+    output->string[0] = '-';
+    memcpy(output->string + 1, input_error, size);
+    output->string[size+1] = '\r';
+    output->string[size+2] = '\n';
+
+    return 0;
+}
+
+int array_encoder(size_t n, char** output) {
+    size_t x = 1;
+    int p = 1;
+    size_t num = n;
+
+    while (num/p != 0) {
+        p *= 10;
+        x++;
+        num = num/p;
+    }
+
+    char* encoded_string = malloc((x+3)*sizeof(char));
+
+    char n_string[x];
+
+    encoded_string[0] = '*';
+    snprintf(n_string, x + 1, "%zu", n);
+    memcpy(encoded_string + 1, n_string, x);
+
+    encoded_string[x+1] = '\r';
+    encoded_string[x+2] = '\n';
+
+    *output = malloc((x+3)*sizeof(char));
+
+    memcpy(*output, encoded_string, x+3);
+    free(encoded_string);
+
+    return 0;
+}
+
 int integer_encoder(long long input_int, struct Integer *output) {
     char buf[32];
 
@@ -164,7 +217,6 @@ int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
 
     memcpy(encoded_string + x + 3, input_string, len);
 
-
     encoded_string[len + x + 3] = '\r';
     encoded_string[len + x + 4] = '\n';
 
@@ -175,6 +227,8 @@ int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
 
     return 0;
 }
+
+
 
 int main() {
     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
@@ -202,5 +256,9 @@ int main() {
     printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
     free(bulk_string.string);
 
+    char* output;
+    array_encoder(10, &output);
+    printf("%s\n", output);
+    free(output);
     return 0;
 }
