@@ -34,7 +34,6 @@ struct Error {
 
 struct Integer {
     char* value;
-    size_t size;
 };
 
 void free_command_list(struct Arg* command_list, size_t size) {
@@ -73,20 +72,16 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     i++;
 
     while (i<len) {
-        printf("current char: %c\n", input[i]);
         if (input[i]!='$') return -1;
         unsigned int str_len = 0;
         i++;
         while (input[i]!='\r') {
-            printf("current char: %c\n", input[i]);
             if (input[i] > '9' || input[i] < '0') return -1;
             str_len = (str_len*10) + (input[i] - '0');
-            printf("%d\n", str_len);
             i++;
         }
 
         i++;
-        printf("current char: %c\n", input[i]);
         if (input[i] != '\n') return -1;
         i++;
         char* command = malloc((str_len+1)*sizeof(char));
@@ -97,12 +92,10 @@ int parse_input(struct Command *command, const char* input, size_t len) {
         memcpy(command, input + i, str_len);
         command[str_len] = '\0';
         i = i + str_len + 2;
-        printf("current char: %c, i= %d\n", input[i], i);
 
         command_list[command_index].command = command;
         command_list[command_index].size = str_len + 1;
         command_index++;
-        printf("command: %s\n", command);
     }
     return 0;
 }
@@ -227,8 +220,6 @@ int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
 
     return 0;
 }
-
-
 
 int main() {
     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
