@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,15 +45,42 @@ int create_listener() {
         free(res);
         return -1;
     }
-
+    listen(sockfd, 10);
     return sockfd;
 }
 
-int serve_client(int fd);
+int serve_client(int fd) {
+    char* msg = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
+    int bytes_sent = send(fd, msg, strlen(msg), 0);
+    if (bytes_sent == 0) {
+        fprintf(stderr, "bytes not sent\n");
+    } else {
+        printf("sent %d bytes\n", bytes_sent);
+    }
+    char buf[4096];
+    while (1) {
+        recv(fd, buf, 4095, 0);
+        // printf("%s\n", buf);
+    }
+    return 0;
+}
 
 
 int main() {
+    int fd;
+    fd = create_listener();
+    if (fd == -1) {
+        fprintf(stderr, "could not create listner\n");
+        exit(1);
+    }
 
+    int status = accept(fd, NULL, NULL);
+    if (status == -1) {
+        perror("accept");
+        exit(1);
+    }
+
+    serve_client(status);
     return 0;
 }
 

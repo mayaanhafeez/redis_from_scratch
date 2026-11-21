@@ -34,6 +34,7 @@ struct Error {
 
 struct Integer {
     char* value;
+    size_t size;
 };
 
 void free_command_list(struct Arg* command_list, size_t size) {
