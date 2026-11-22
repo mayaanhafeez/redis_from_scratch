@@ -13,16 +13,6 @@ struct Command {
     size_t argc;
 };
 
-// struct Output {
-//     char* string;
-//     size_t size;
-// };
-
-// struct Output {
-//     char* string;
-//     size_t size;
-// };
-
 struct Output {
     char* string;
     size_t size;

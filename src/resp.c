@@ -19,7 +19,6 @@ void free_command_list(struct Arg* command_list, size_t size) {
     free(command_list);
 }
 
-//take in 1 input command and its length, change the global command_list, return 0 on success and -1 on failure
 int parse_input(struct Command *command, const char* input, size_t len) {
     struct Arg* command_list;
     unsigned int command_count = 0;
@@ -117,7 +116,6 @@ int array_encoder(struct Output *output ,size_t n) {
     size_t num = n;
 
         while (num/10 != 0) {
-            printf("x is %zu, num is %zu\n", x, num);
             x++;
             num = num/10;
         }

@@ -1,23 +1,56 @@
-// #include "resp.h"
-//
-// struct command_functions {
-//     char* command;
-//     int (*fp)();
-// };
-//
-//
-// int simple_string_encoder(char* input_string, struct Output *output);
-//
-// int error_encoder(char* input_error, struct Output *output);
-//
-// int array_encoder(size_t n, char** output);
-//
-// int integer_encoder(long long input_int, struct Output *output);
-//
-// int bulk_string_encoder(char* input_string, size_t len, struct Output *output);
-//
-// static const command_table[];
-//
-// int execute(struct Command input_command, char** output, size_t* output_len) {
-//
-// }
+#include "resp.h"
+#include <stdio.h>
+
+struct command_functions {
+    char* command;
+    int (*fp)(struct Command *command, struct Output *output);
+};
+
+int echo_handler(struct Command *command, struct Output *output) {
+    if (command->argc == 2) {
+        int ret = bulk_string_encoder(command->args[1].command,command->args[1].size , output);
+        if (ret != 0) {
+            fprintf(stderr, "bad stuff");
+        }
+        return ret;
+    }
+    else if (command->argc > 2){
+        int ret = error_encoder("ERR wrong number of arguments", output);
+        if (ret != 0) {
+            fprintf(stderr, "bad stuff");
+        }
+        return ret;
+    } else {
+        return -1;
+    }
+}
+
+int ping_handler(struct Command *command, struct Output *output){
+    if (command->argc == 1) {
+        int ret = simple_string_encoder("PONG", output);
+        if (ret != 0) {
+            fprintf(stderr, "something bad");
+        }
+        return ret;
+    } else {
+        int ret = echo_handler(command, output);
+        if (ret != 0) {
+            fprintf(stderr, "something bad");
+        }
+        return ret;
+    }
+}
+
+int command_handler(struct Command *command, struct Output *output) {
+    (void)command;
+    int ret = array_encoder(output, 0);
+    return ret;
+}
+
+static const struct command_functions command_table[] = {
+    {"ECHO", echo_handler},
+    {"PING", ping_handler},
+    {"COMMAND", command_handler},
+};
+
+int execute(struct Command input_command, char** output, size_t* output_len);
