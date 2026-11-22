@@ -79,7 +79,7 @@ int parse_input(struct Command *command, const char* input, size_t len) {
 int simple_string_encoder(char* input_string, struct Output *output) {
     size_t size = strlen(input_string);
     output->string = malloc((size+3)*sizeof(char));
-    output->size = size;
+    output->size = size+3;
 
     if (output->string == NULL) {
         perror("malloc fail");
@@ -97,7 +97,7 @@ int simple_string_encoder(char* input_string, struct Output *output) {
 int error_encoder(char* input_error, struct Output *output) {
     size_t size = strlen(input_error);
     output->string = malloc((size+3)*sizeof(char));
-    output->size = size;
+    output->size = size+3;
 
     if (output->string == NULL) {
         perror("malloc fail");
@@ -114,14 +114,13 @@ int error_encoder(char* input_error, struct Output *output) {
 
 int array_encoder(struct Output *output ,size_t n) {
     size_t x = 1;
-    int p = 1;
     size_t num = n;
 
-    while (num/p != 0) {
-        p *= 10;
-        x++;
-        num = num/p;
-    }
+        while (num/10 != 0) {
+            printf("x is %zu, num is %zu\n", x, num);
+            x++;
+            num = num/10;
+        }
 
     char* encoded_string = malloc((x+3)*sizeof(char));
 
@@ -135,6 +134,7 @@ int array_encoder(struct Output *output ,size_t n) {
     encoded_string[x+2] = '\n';
 
     output->string = malloc((x+3)*sizeof(char));
+    output->size = x+3;
 
     memcpy(output->string, encoded_string, x+3);
     free(encoded_string);
@@ -165,14 +165,13 @@ int integer_encoder(long long input_int, struct Output *output) {
 
 int bulk_string_encoder(char* input_string, size_t len, struct Output *output) {
     size_t x = 1;
-    int p = 1;
     size_t num = len;
 
-    while (num/p != 0) {
-        p *= 10;
-        x++;
-        num = num/p;
-    }
+        while (num/10 != 0) {
+            printf("x is %zu, num is %zu\n", x, num);
+            x++;
+            num = num/10;
+        }
 
     char* encoded_string = malloc((len+x+5)*sizeof(char));
     encoded_string[0] = '$';
@@ -192,7 +191,7 @@ int bulk_string_encoder(char* input_string, size_t len, struct Output *output) {
     output->string = malloc((len+x+5)*sizeof(char));
 
     memcpy(output->string, encoded_string, len+x+5);
-    output->size = len;
+    output->size = len+x+5;
 
     return 0;
 }
@@ -219,12 +218,12 @@ int main() {
     printf("integer size: %zu\n", integer.size);
 
     struct Output bulk_string;
-    bulk_string_encoder("good morning sir how are you", 28, &bulk_string);
+    bulk_string_encoder("good job bro u ruined everything", 32, &bulk_string);
     printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
     free(bulk_string.string);
 
     struct Output output;
-    array_encoder(&output, 10);
+    array_encoder(&output, 1);
     printf("%s\n", output.string);
     free(output.string);
     return 0;
