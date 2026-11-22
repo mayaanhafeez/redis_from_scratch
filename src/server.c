@@ -6,12 +6,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include "resp.h"
+#include "commands.c"
 
 int create_listener() {
     struct addrinfo hints;
     struct addrinfo *res;
     int sockfd;
-    int new_fd;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; //v4
@@ -50,17 +51,26 @@ int create_listener() {
 }
 
 int serve_client(int fd) {
-    char* msg = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
+    struct Command *input_command;
+    char buf[16384];
+    int bytes_recv;
+    while (1) {
+        bytes_recv = recv(fd, buf, 16384, 0);
+        if (bytes_recv < 0) {
+            // error
+        } else if (bytes_recv == 0) {
+            //exit
+        } else {
+            parse_input(input_command, buf, bytes_recv);
+            execute_command();
+        }
+    }
+
     int bytes_sent = send(fd, msg, strlen(msg), 0);
     if (bytes_sent == 0) {
         fprintf(stderr, "bytes not sent\n");
     } else {
         printf("sent %d bytes\n", bytes_sent);
-    }
-    char buf[4096];
-    while (1) {
-        recv(fd, buf, 4095, 0);
-        // printf("%s\n", buf);
     }
     return 0;
 }
@@ -74,13 +84,13 @@ int main() {
         exit(1);
     }
 
-    int status = accept(fd, NULL, NULL);
-    if (status == -1) {
+    int new_fd = accept(fd, NULL, NULL);
+    if (new_fd == -1) {
         perror("accept");
         exit(1);
     }
 
-    serve_client(status);
+    serve_client(new_fd);
     return 0;
 }
 

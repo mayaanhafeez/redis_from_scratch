@@ -13,32 +13,32 @@ struct Command {
     size_t argc;
 };
 
-struct String {
-    char* string;
-    size_t size;
-};
+// struct Output {
+//     char* string;
+//     size_t size;
+// };
 
-struct Error {
-    char* string;
-    size_t size;
-};
+// struct Output {
+//     char* string;
+//     size_t size;
+// };
 
-struct Integer {
-    char* value;
+struct Output {
+    char* string;
     size_t size;
 };
 
 
 int parse_input(struct Command *command, const char* input, size_t);
 
-int simple_string_encoder(char* input_string, struct String *output);
+int simple_string_encoder(char* input_string, struct Output *output);
 
-int error_encoder(char* input_error, struct Error *output);
+int error_encoder(char* input_error, struct Output *output);
 
-int array_encoder(size_t n, char** output);
+int array_encoder(struct Output *output, size_t n);
 
-int integer_encoder(long long input_int, struct Integer *output);
+int integer_encoder(long long input_int, struct Output *output);
 
-int bulk_string_encoder(char* input_string, size_t len, struct String *output);
+int bulk_string_encoder(char* input_string, size_t len, struct Output *output);
 
 #endif

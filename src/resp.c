@@ -76,7 +76,7 @@ int parse_input(struct Command *command, const char* input, size_t len) {
     return 0;
 }
 
-int simple_string_encoder(char* input_string, struct String *output) {
+int simple_string_encoder(char* input_string, struct Output *output) {
     size_t size = strlen(input_string);
     output->string = malloc((size+3)*sizeof(char));
     output->size = size;
@@ -94,7 +94,7 @@ int simple_string_encoder(char* input_string, struct String *output) {
     return 0;
 }
 
-int error_encoder(char* input_error, struct Error *output) {
+int error_encoder(char* input_error, struct Output *output) {
     size_t size = strlen(input_error);
     output->string = malloc((size+3)*sizeof(char));
     output->size = size;
@@ -112,7 +112,7 @@ int error_encoder(char* input_error, struct Error *output) {
     return 0;
 }
 
-int array_encoder(size_t n, char** output) {
+int array_encoder(struct Output *output ,size_t n) {
     size_t x = 1;
     int p = 1;
     size_t num = n;
@@ -134,15 +134,15 @@ int array_encoder(size_t n, char** output) {
     encoded_string[x+1] = '\r';
     encoded_string[x+2] = '\n';
 
-    *output = malloc((x+3)*sizeof(char));
+    output->string = malloc((x+3)*sizeof(char));
 
-    memcpy(*output, encoded_string, x+3);
+    memcpy(output->string, encoded_string, x+3);
     free(encoded_string);
 
     return 0;
 }
 
-int integer_encoder(long long input_int, struct Integer *output) {
+int integer_encoder(long long input_int, struct Output *output) {
     char buf[32];
 
     buf[0] = ':';
@@ -157,13 +157,13 @@ int integer_encoder(long long input_int, struct Integer *output) {
         exit(1);
     }
 
-    output->value = int_s;
+    output->string = int_s;
     output->size = len + 3;
 
     return 0;
 }
 
-int bulk_string_encoder(char* input_string, size_t len, struct String *output) {
+int bulk_string_encoder(char* input_string, size_t len, struct Output *output) {
     size_t x = 1;
     int p = 1;
     size_t num = len;
@@ -204,7 +204,7 @@ int main() {
     int value = parse_input(&command, dummy, strlen(dummy));
     printf("return value:%d\n",value);
     free_command_list(command.args, command.argc);
-    struct String simple_string;
+    struct Output simple_string;
     char* string = "hawk";
 
     simple_string_encoder(string, &simple_string);
@@ -213,19 +213,19 @@ int main() {
     printf("%zu\n", simple_string.size);
     free(simple_string.string);
 
-    struct Integer integer;
+    struct Output integer;
     integer_encoder(742389429, &integer);
-    printf("integer value: %s", integer.value);
+    printf("integer value: %s", integer.string);
     printf("integer size: %zu\n", integer.size);
 
-    struct String bulk_string;
+    struct Output bulk_string;
     bulk_string_encoder("good morning sir how are you", 28, &bulk_string);
     printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
     free(bulk_string.string);
 
-    char* output;
-    array_encoder(10, &output);
-    printf("%s\n", output);
-    free(output);
+    struct Output output;
+    array_encoder(&output, 10);
+    printf("%s\n", output.string);
+    free(output.string);
     return 0;
 }
