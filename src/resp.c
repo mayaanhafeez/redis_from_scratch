@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "resp.h"
 
 enum resp_data_type {
     string,
@@ -9,32 +10,6 @@ enum resp_data_type {
     error,
     bulk_string,
     array,
-};
-
-
-struct Arg {
-    char* command;
-    size_t size;
-};
-
-struct Command {
-    struct Arg *args;
-    size_t argc;
-};
-
-struct String {
-    char* string;
-    size_t size;
-};
-
-struct Error {
-    char* string;
-    size_t size;
-};
-
-struct Integer {
-    char* value;
-    size_t size;
 };
 
 void free_command_list(struct Arg* command_list, size_t size) {
