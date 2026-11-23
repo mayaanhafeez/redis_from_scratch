@@ -65,9 +65,12 @@ int serve_client(int fd) {
             exit(1);
         } else {
             parse_input(&input_command, buf, bytes_recv);
-
+            printf("bytes: %d\n", bytes_recv);
+            printf("%s\n", input_command.args->command);
             execute_command(&input_command, &output);
+            free_command_list(input_command.args, input_command.argc);
             msg = output.string;
+            printf("%s\n", output.string);
             bytes_sent = send(fd, msg, strlen(msg), 0);
             if (bytes_sent == 0) {
                 fprintf(stderr, "bytes not sent\n");

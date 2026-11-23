@@ -31,4 +31,5 @@ int integer_encoder(long long input_int, struct Output *output);
 
 int bulk_string_encoder(char* input_string, size_t len, struct Output *output);
 
+void free_command_list(struct Arg* command_list, size_t size);
 #endif

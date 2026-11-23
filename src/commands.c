@@ -52,10 +52,12 @@ static const struct command_functions command_table[] = {
     {"ECHO", echo_handler},
     {"PING", ping_handler},
     {"COMMAND", command_handler},
+    {"DOCS", command_handler},
 };
 
 int execute_command(struct Command *input_command, struct Output *output) {
-    for (int i = 0; i<3; i++) {
+    for (int i = 0; i<4; i++) {
+        printf("input: %s, compare: %s\n", input_command->args[1].command, command_table[i].command);
         if (strcmp(input_command->args[1].command, command_table[i].command)==0) {
             command_table[i].fp(input_command, output);
         }
