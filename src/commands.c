@@ -1,5 +1,6 @@
 #include "resp.h"
 #include <stdio.h>
+#include <string.h>
 
 struct command_functions {
     char* command;
@@ -53,4 +54,13 @@ static const struct command_functions command_table[] = {
     {"COMMAND", command_handler},
 };
 
-int execute(struct Command input_command, char** output, size_t* output_len);
+int execute_command(struct Command *input_command, struct Output *output) {
+    for (int i = 0; i<3; i++) {
+        if (strcmp(input_command->args[1].command, command_table[i].command)==0) {
+            command_table[i].fp(input_command, output);
+        }
+    }
+    return 1;
+}
+
+

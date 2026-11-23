@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include "resp.h"
-#include "commands.c"
+#include "commands.h"
 
 int create_listener() {
     struct addrinfo hints;
@@ -51,28 +51,32 @@ int create_listener() {
 }
 
 int serve_client(int fd) {
-    struct Command *input_command;
+    struct Command input_command;
+    struct Output output;
+    char* msg;
     char buf[16384];
     int bytes_recv;
+    int bytes_sent;
     while (1) {
         bytes_recv = recv(fd, buf, 16384, 0);
         if (bytes_recv < 0) {
-            // error
+            fprintf(stderr, "things broke bro");
         } else if (bytes_recv == 0) {
-            //exit
+            exit(1);
         } else {
-            parse_input(input_command, buf, bytes_recv);
-            execute_command();
+            parse_input(&input_command, buf, bytes_recv);
+
+            execute_command(&input_command, &output);
+            msg = output.string;
+            bytes_sent = send(fd, msg, strlen(msg), 0);
+            if (bytes_sent == 0) {
+                fprintf(stderr, "bytes not sent\n");
+            } else {
+                printf("sent %d bytes\n", bytes_sent);
+            }
         }
     }
-
-    int bytes_sent = send(fd, msg, strlen(msg), 0);
-    if (bytes_sent == 0) {
-        fprintf(stderr, "bytes not sent\n");
-    } else {
-        printf("sent %d bytes\n", bytes_sent);
-    }
-    return 0;
+    return 1;
 }
 
 

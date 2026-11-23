@@ -193,36 +193,36 @@ int bulk_string_encoder(char* input_string, size_t len, struct Output *output) {
 
     return 0;
 }
-
-int main() {
-    const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
-    struct Command command;
-
-    int value = parse_input(&command, dummy, strlen(dummy));
-    printf("return value:%d\n",value);
-    free_command_list(command.args, command.argc);
-    struct Output simple_string;
-    char* string = "hawk";
-
-    simple_string_encoder(string, &simple_string);
-
-    printf("%s", simple_string.string);
-    printf("%zu\n", simple_string.size);
-    free(simple_string.string);
-
-    struct Output integer;
-    integer_encoder(742389429, &integer);
-    printf("integer value: %s", integer.string);
-    printf("integer size: %zu\n", integer.size);
-
-    struct Output bulk_string;
-    bulk_string_encoder("good job bro u ruined everything", 32, &bulk_string);
-    printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
-    free(bulk_string.string);
-
-    struct Output output;
-    array_encoder(&output, 1);
-    printf("%s\n", output.string);
-    free(output.string);
-    return 0;
-}
+//
+// int main() {
+//     const char* dummy = "*3\r\n$4\r\nECHO\r\n$5\r\nhello\r\n$3\r\nkys\r\n";
+//     struct Command command;
+//
+//     int value = parse_input(&command, dummy, strlen(dummy));
+//     printf("return value:%d\n",value);
+//     free_command_list(command.args, command.argc);
+//     struct Output simple_string;
+//     char* string = "hawk";
+//
+//     simple_string_encoder(string, &simple_string);
+//
+//     printf("%s", simple_string.string);
+//     printf("%zu\n", simple_string.size);
+//     free(simple_string.string);
+//
+//     struct Output integer;
+//     integer_encoder(742389429, &integer);
+//     printf("integer value: %s", integer.string);
+//     printf("integer size: %zu\n", integer.size);
+//
+//     struct Output bulk_string;
+//     bulk_string_encoder("good job bro u ruined everything", 32, &bulk_string);
+//     printf("bulk string: %s and its size %zu\n", bulk_string.string, bulk_string.size);
+//     free(bulk_string.string);
+//
+//     struct Output output;
+//     array_encoder(&output, 1);
+//     printf("%s\n", output.string);
+//     free(output.string);
+//     return 0;
+// }
