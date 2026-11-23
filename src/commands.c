@@ -9,19 +9,24 @@ struct command_functions {
 
 int echo_handler(struct Command *command, struct Output *output) {
     if (command->argc == 2) {
+        printf("bulk string input: %s\n", command->args[1].command);
         int ret = bulk_string_encoder(command->args[1].command,command->args[1].size , output);
         if (ret != 0) {
             fprintf(stderr, "bad stuff");
         }
+        printf("output: %s\n", output->string);
         return ret;
-    }
-    else if (command->argc > 2){
+    } else if (command->argc > 2){
         int ret = error_encoder("ERR wrong number of arguments", output);
         if (ret != 0) {
             fprintf(stderr, "bad stuff");
         }
         return ret;
     } else {
+        int ret = error_encoder("ERR wrong number of arguments", output);
+        if (ret != 0) {
+            fprintf(stderr, "bad stuff");
+        }
         return -1;
     }
 }
@@ -57,9 +62,10 @@ static const struct command_functions command_table[] = {
 
 int execute_command(struct Command *input_command, struct Output *output) {
     for (int i = 0; i<4; i++) {
-        printf("input: %s, compare: %s\n", input_command->args[1].command, command_table[i].command);
-        if (strcmp(input_command->args[1].command, command_table[i].command)==0) {
+        printf("input: %s, compare: %s\n", input_command->args[0].command, command_table[i].command);
+        if (strcmp(input_command->args[0].command, command_table[i].command)==0) {
             command_table[i].fp(input_command, output);
+            break;
         }
     }
     return 1;

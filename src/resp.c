@@ -69,7 +69,7 @@ int parse_input(struct Command *command, const char* input, size_t len) {
         i = i + str_len + 2;
 
         command_list[command_index].command = command;
-        command_list[command_index].size = str_len + 1;
+        command_list[command_index].size = str_len;
         command_index++;
     }
     return 0;

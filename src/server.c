@@ -51,8 +51,6 @@ int create_listener() {
 }
 
 int serve_client(int fd) {
-    struct Command input_command;
-    struct Output output;
     char* msg;
     char buf[16384];
     int bytes_recv;
@@ -64,19 +62,21 @@ int serve_client(int fd) {
         } else if (bytes_recv == 0) {
             exit(1);
         } else {
+            struct Command input_command;
+            struct Output output;
             parse_input(&input_command, buf, bytes_recv);
-            printf("bytes: %d\n", bytes_recv);
-            printf("%s\n", input_command.args->command);
+            printf("bytes recv: %d\n", bytes_recv);
+            printf("command: %s\n", input_command.args->command);
             execute_command(&input_command, &output);
-            free_command_list(input_command.args, input_command.argc);
             msg = output.string;
-            printf("%s\n", output.string);
-            bytes_sent = send(fd, msg, strlen(msg), 0);
+            printf("msg:%s\n", output.string);
+            bytes_sent = send(fd, msg, output.size, 0);
             if (bytes_sent == 0) {
                 fprintf(stderr, "bytes not sent\n");
             } else {
                 printf("sent %d bytes\n", bytes_sent);
             }
+            free_command_list(input_command.args, input_command.argc);
         }
     }
     return 1;
