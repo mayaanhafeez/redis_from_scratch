@@ -6,6 +6,5 @@
 .DS_Store
 /reference
 *.out
-/PLAN.md
 /redis
 *.dSYM/
