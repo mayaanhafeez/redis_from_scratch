@@ -4,7 +4,7 @@ A Redis-compatible server written from scratch: real clients (`redis-cli`, clien
 libraries, `redis-benchmark`) connect to it and can't tell the difference for the
 commands it supports.
 
-Language: **TBD** (C, Rust, or Go; see "Language" below). Target Linux; the event loop
+Target Linux; the event loop
 is the heart of the project, so write it against `epoll` directly rather than hiding it
 behind an async runtime.
 
@@ -50,16 +50,9 @@ behind an async runtime.
 
 ## Language
 
-All three work. Pick based on what you want the project to show:
-
-- **C**: closest to real Redis (which is C). You hand-build the hash table, dynamic
+- **C**: closest to real Redis. You hand-build the hash table, dynamic
   strings, and buffers, and call `epoll` directly. Strongest "systems" signal, most time
-  spent on memory bugs. Adds C to a portfolio that's mostly Rust.
-- **Rust**: you already ship Rust (ssht, macwifi), so less new breadth. Use `mio` or raw
-  `libc` epoll, not tokio, or the interesting part becomes "used tokio".
-- **Go**: the most common backend language in internships and quick to write, but
-  goroutines and `net` hide the event loop unless you deliberately use `syscall` epoll.
-  GC pauses are visible in p99 latency, which is itself an interesting thing to measure.
+  spent on memory bugs.
 
 ## Done means
 
